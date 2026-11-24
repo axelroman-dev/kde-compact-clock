@@ -94,7 +94,14 @@ MouseArea {
         return result;
     }
 
-    readonly property string separator: Plasmoid.configuration.segmentSeparator
+    readonly property string separator: {
+        const raw = Plasmoid.configuration.segmentSeparator;
+        if (!Plasmoid.configuration.padSeparator) {
+            return raw;
+        }
+        const core = raw.trim();
+        return core.length > 0 ? ` ${core} ` : " ";
+    }
 
     readonly property string compactText: {
         const parts = main.visibleSegments.map(s => s.text);
@@ -173,6 +180,7 @@ MouseArea {
         function onShowDayChanged() { main.timeFormatCorrection(); }
         function onSegmentOrderChanged() { main.setupLabels(); }
         function onSegmentSeparatorChanged() { main.setupLabels(); }
+        function onPadSeparatorChanged() { main.setupLabels(); }
         function onDayFormatChanged() { main.setupLabels(); }
         function onUse24hFormatChanged() { main.timeFormatCorrection(); }
         function onDateFormatChanged() { main.setupLabels(); }
@@ -249,7 +257,7 @@ MouseArea {
             font.family: fontHelper.font.family
             font.weight: fontHelper.font.weight
             font.italic: fontHelper.font.italic
-            font.features: { "tnum": 1 }
+            font.features: Object.assign({}, Kirigami.Theme.defaultFont.features, { "tnum": 1 })
             font.pixelSize: 1024
             fontSizeMode: Text.VerticalFit
             minimumPixelSize: 1
@@ -272,7 +280,7 @@ MouseArea {
                 font.family: fontHelper.font.family
                 font.weight: fontHelper.font.weight
                 font.italic: fontHelper.font.italic
-                font.features: { "tnum": 1 }
+                font.features: Object.assign({}, Kirigami.Theme.defaultFont.features, { "tnum": 1 })
                 font.pixelSize: Math.round(main.height * (Plasmoid.configuration.showDate || Plasmoid.configuration.showDay ? 0.56 : 0.71))
             }
 
@@ -332,7 +340,7 @@ MouseArea {
         font.family: fontHelper.font.family
         font.weight: fontHelper.font.weight
         font.italic: fontHelper.font.italic
-        font.features: { "tnum": 1 }
+        font.features: Object.assign({}, Kirigami.Theme.defaultFont.features, { "tnum": 1 })
         height: Math.min(main.height > 0 ? main.height : fontHelper.contentHeight, fontHelper.contentHeight)
         font.pixelSize: fontHelper.font.pixelSize
         fontSizeMode: Text.VerticalFit
@@ -377,7 +385,13 @@ MouseArea {
         const amPm = "AP";
         const uses24hFormatByDefault = timeFormatString.toLowerCase().indexOf("ap") === -1;
 
-        let result = hours.toLowerCase() + delimiter + minutes;
+        let hoursFormat = hours.toLowerCase();
+        // A 12h locale has no convention for 24h times, so when 24h is forced
+        // use zero-padded hours (00:27, not 0:27) — same as stock Plasma 6.8
+        if (Plasmoid.configuration.use24hFormat === Qt.Checked && !uses24hFormatByDefault) {
+            hoursFormat = "hh";
+        }
+        let result = hoursFormat + delimiter + minutes;
         let result_sec = result + delimiter + seconds;
 
         if ((Plasmoid.configuration.use24hFormat === Qt.PartiallyChecked && !uses24hFormatByDefault)

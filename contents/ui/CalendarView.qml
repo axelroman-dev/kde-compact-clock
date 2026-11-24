@@ -56,19 +56,6 @@ PlasmaExtras.Representation {
     // We cannot use Kirigami.SizeGroup here because monthView's header is not in a layout.
     readonly property double headerHeight: Math.max(agendaHeader.implicitHeight, monthView.viewHeader.implicitHeight)
 
-    Keys.onDownPressed: event => {
-        monthView.Keys.downPressed(event);
-    }
-
-    Connections {
-        target: root
-
-        function onExpandedChanged() {
-            // clear all the selections when the plasmoid is showing/hiding
-            monthView.resetToToday();
-        }
-    }
-
     PlasmaCalendar.EventPluginsManager {
         id: eventPluginsManager
         enabledPlugins: Plasmoid.configuration.enabledCalendarPlugins
@@ -160,7 +147,7 @@ PlasmaExtras.Representation {
 
                         Accessible.description: i18nc("@info:tooltip", "Add a new event")
                         KeyNavigation.down: KeyNavigation.tab
-                        KeyNavigation.right: monthView.viewHeader.tabBar
+                        Keys.onRightPressed: monthView.viewHeader.tabBar.focusFirstButton()
 
                         onClicked: ApplicationIntegration.launchCalendar()
                         KeyNavigation.tab: calendar.showAgenda && eventsList.count ? eventsList : eventsList.KeyNavigation.down
@@ -190,10 +177,11 @@ PlasmaExtras.Representation {
             }
 
             function dateEquals(date1: date, date2: date): bool {
-                // Compare two dates without taking time into account
-                return date1.getFullYear() === date2.getFullYear()
-                    && date1.getMonth() === date2.getMonth()
-                    && date1.getDate() === date2.getDate();
+                // QDate is exposed to QML as midnight UTC, while MonthView's
+                // current date is constructed in the local time zone.
+                return date1.getUTCFullYear() === date2.getFullYear()
+                    && date1.getUTCMonth() === date2.getMonth()
+                    && date1.getUTCDate() === date2.getDate();
             }
 
             function updateEventsForCurrentDate() {
@@ -293,11 +281,6 @@ PlasmaExtras.Representation {
                             return !(startIsMidnight && endIsMidnight && sameDay);
                         }
 
-                        PlasmaComponents.ToolTip {
-                            text: eventItem.modelData.description
-                            visible: text !== "" && eventItem.hovered
-                        }
-
                         contentItem: GridLayout {
                             id: eventGrid
                             columns: 3
@@ -344,6 +327,7 @@ PlasmaExtras.Representation {
 
                                 Layout.row: 1
                                 Layout.column: 1
+                                Layout.alignment: Qt.AlignTop
                                 Layout.minimumWidth: dateLabelMetrics.width
 
                                 text: endsToday || endsTomorrowInLessThan12Hours
@@ -356,19 +340,33 @@ PlasmaExtras.Representation {
                                 visible: eventItem.hasTime
                             }
 
-                            PlasmaComponents.Label {
+                            Kirigami.SelectableLabel {
                                 id: eventTitle
 
                                 Layout.row: 0
                                 Layout.column: 2
                                 Layout.fillWidth: true
 
-                                elide: Text.ElideRight
                                 text: eventItem.modelData.title
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
-                                maximumLineCount: 2
                                 wrapMode: Text.Wrap
+                            }
+
+                            Kirigami.SelectableLabel {
+                                id: eventDescription
+
+                                Layout.row: 1
+                                Layout.column: 2
+                                Layout.fillWidth: true
+                                spacing: 0
+                                
+                                visible: text.length > 0
+                                text: eventItem.modelData.description
+                                                                    
+                                wrapMode: Text.Wrap
+                                
+                                onLinkActivated: link => Qt.openUrlExternally(link)
                             }
                         }
                     }
@@ -619,10 +617,6 @@ PlasmaExtras.Representation {
         // Not anchoring to horizontalCenter to avoid sub-pixel misalignments
         width: (calendar.showAgenda || calendar.showClocks) ? Math.round(parent.width / 2) : parent.width
 
-        onActiveFocusChanged: if (activeFocus) {
-            monthViewWrapper.nextItemInFocusChain().forceActiveFocus();
-        }
-
         PlasmaCalendar.MonthView {
             id: monthView
             viewHeader.height: calendar.headerHeight
@@ -649,9 +643,7 @@ PlasmaExtras.Representation {
 
             KeyNavigation.left: KeyNavigation.tab
             KeyNavigation.tab: addEventButton.visible ? addEventButton : addEventButton.KeyNavigation.down
-            Keys.onUpPressed: event => {
-                viewHeader.tabBar.currentItem.forceActiveFocus(Qt.BacktabFocusReason);
-            }
+            Keys.onUpPressed: viewHeader.previousButton.forceActiveFocus(Qt.BacktabFocusReason);
         }
     }
 }

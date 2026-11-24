@@ -18,7 +18,8 @@ import org.kde.plasma.private.digitalclock
 Item {
     id: toolTipContentItem
 
-    property int preferredTextWidth: Kirigami.Units.gridUnit * 20
+    property int minimumTextWidth: Kirigami.Units.gridUnit * 25
+    property int maximumTextWidth: Math.max(minimumTextWidth, clocks.implicitWidth)
 
     implicitWidth: mainLayout.implicitWidth + Kirigami.Units.gridUnit
     implicitHeight: mainLayout.implicitHeight + Kirigami.Units.gridUnit
@@ -62,11 +63,9 @@ Item {
         Kirigami.Heading {
             id: tooltipMaintext
 
-            Layout.minimumWidth: Math.min(implicitWidth, toolTipContentItem.preferredTextWidth)
-            Layout.maximumWidth: toolTipContentItem.preferredTextWidth
+            Layout.maximumWidth: toolTipContentItem.maximumTextWidth
 
             level: 3
-            elide: Text.ElideRight
             // keep this consistent with toolTipMainText in analog-clock
             property var mainText: {
                 const text = clocks.visible ? Qt.formatDate(clock.dateTime, Qt.locale(), Locale.LongFormat) : Qt.locale().toString(clock.dateTime, "dddd");
@@ -75,13 +74,13 @@ Item {
             property bool anyTimezoneSet: !!mainText
             text: anyTimezoneSet ? mainText : i18nc("@label main text shown in digital clock's tooltip when timezone is missing", "Time zone is not set")
             textFormat: Text.PlainText
+            wrapMode: Text.Wrap
         }
 
         PlasmaComponents.Label {
             id: tooltipSubtext
 
-            Layout.minimumWidth: Math.min(implicitWidth, toolTipContentItem.preferredTextWidth)
-            Layout.maximumWidth: toolTipContentItem.preferredTextWidth
+            Layout.maximumWidth: toolTipContentItem.maximumTextWidth
             maximumLineCount: 2
             wrapMode: Text.Wrap
 
@@ -97,29 +96,27 @@ Item {
             text: tooltipMaintext.anyTimezoneSet ? subText : i18nc("@label sub text shown in digital clock's tooltip when timezone is missing", "Click the clock icon to open Date & Time settings and set a time zone.")
             opacity: 0.75
             visible: !clocks.visible
-            font.features: { "tnum": 1 }
+            font.features: Object.assign({}, Kirigami.Theme.defaultFont.features, { "tnum": 1 })
             textFormat: Text.PlainText
         }
 
         PlasmaComponents.Label {
             id: tooltipSubLabelText
-            Layout.minimumWidth: Math.min(implicitWidth, toolTipContentItem.preferredTextWidth)
-            Layout.maximumWidth: toolTipContentItem.preferredTextWidth
+            Layout.maximumWidth: toolTipContentItem.maximumTextWidth
             text: (root.fullRepresentationItem as CalendarView)?.monthView.todayAuxilliaryText ?? ""
             textFormat: Text.PlainText
             opacity: 0.75
             visible: !clocks.visible && text.length > 0
+            wrapMode: Text.Wrap
         }
 
         GridLayout {
             id: clocks
-
-            Layout.minimumWidth: Math.min(implicitWidth, toolTipContentItem.preferredTextWidth)
-            Layout.maximumWidth: toolTipContentItem.preferredTextWidth
             Layout.minimumHeight: childrenRect.height
             visible: timeZoneRepeater.count > 0 && tooltipMaintext.anyTimezoneSet
             columns: 2
             rowSpacing: 0
+            Layout.alignment: Qt.AlignHCenter
 
             Repeater {
                 id: timeZoneRepeater
@@ -164,7 +161,7 @@ Item {
                     font.weight: tzClock.timeZone == root.currentTimeZone ? Font.Bold : Font.Normal
                     font.features: {
                         if (index % 2 === 1) {
-                            return { "tnum": 1 }
+                            return Object.assign({}, Kirigami.Theme.defaultFont.features, { "tnum": 1 })
                         } else {
                             return {}
                         }
@@ -176,12 +173,12 @@ Item {
         }
 
         PlasmaComponents.Label {
-            Layout.minimumWidth: Math.min(implicitWidth, toolTipContentItem.preferredTextWidth)
-            Layout.maximumWidth: toolTipContentItem.preferredTextWidth
+            Layout.maximumWidth: toolTipContentItem.maximumTextWidth
             visible: ApplicationIntegration.calendarInstalled
             text: i18nc("@info:tooltip %1 is the name of a calendar application", "Middle-click to open %1", ApplicationIntegration.calendarApplicationName)
             textFormat: Text.PlainText
             opacity: 0.75
+            wrapMode: Text.Wrap
         }
     }
 }

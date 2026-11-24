@@ -1,14 +1,19 @@
 # Credits
 
-## Author
+## Maintainer
+
+- [axelroman-dev](https://github.com/axelroman-dev) — Plasma 6.8 port and maintenance
+
+## Original author
 
 - [N0repi](https://github.com/N0repi) · [norepi.dev](https://norepi.dev) — Compact Clock for Plasma 6
+  ([original repo](https://github.com/N0repi/kde-compact-clock))
 
 ## Upstream
 
 Compact Clock is derived from the **Plasma Digital Clock** applet in
 [plasma-workspace](https://invent.kde.org/plasma/plasma-workspace)
-(reference snapshot: v6.7.3).
+(reference snapshot: v6.7.3, updated with v6.8.3 changes).
 
 Original Digital Clock authors include (non-exhaustive):
 

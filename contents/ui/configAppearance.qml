@@ -46,6 +46,16 @@ KCMUtils.SimpleKCM {
     property alias cfg_dateDisplayFormat: dateDisplayFormat.currentIndex
     property string cfg_segmentOrder: "date,time"
     property alias cfg_segmentSeparator: segmentSeparatorField.text
+    property alias cfg_padSeparator: padSeparatorCheckBox.checked
+
+    function effectiveSeparator(): string {
+        const raw = appearancePage.cfg_segmentSeparator;
+        if (!appearancePage.cfg_padSeparator) {
+            return raw;
+        }
+        const core = raw.trim();
+        return core.length > 0 ? ` ${core} ` : " ";
+    }
 
     readonly property var orderPresets: [
         { label: i18n("Date, Time"), value: "date,time" },
@@ -100,7 +110,7 @@ KCMUtils.SimpleKCM {
             seen[token] = true;
             parts.push(values[token]);
         }
-        return parts.join(appearancePage.cfg_segmentSeparator);
+        return parts.join(appearancePage.effectiveSeparator());
     }
 
     Kirigami.FormLayout {
@@ -184,7 +194,12 @@ KCMUtils.SimpleKCM {
             id: segmentSeparatorField
             Kirigami.FormData.label: i18n("Separator:")
             Layout.preferredWidth: appearancePage.comboBoxWidth
-            placeholderText: " | "
+            placeholderText: "|"
+        }
+
+        QQC2.CheckBox {
+            id: padSeparatorCheckBox
+            text: i18n("Add spaces around separator")
         }
 
         QQC2.Label {
@@ -198,6 +213,7 @@ KCMUtils.SimpleKCM {
                 appearancePage.cfg_showDate;
                 appearancePage.cfg_segmentOrder;
                 appearancePage.cfg_segmentSeparator;
+                appearancePage.cfg_padSeparator;
                 appearancePage.cfg_dayFormat;
                 appearancePage.cfg_dateFormat;
                 appearancePage.cfg_customDateFormat;
@@ -449,8 +465,8 @@ KCMUtils.SimpleKCM {
                 icon.name: "settings-configure"
                 enabled: manualFontAndSizeRadioButton.checked
                 onClicked: {
-                    fontDialog.currentFont = fontDialog.fontChosen
                     fontDialog.open()
+                    fontDialog.currentFont = fontDialog.fontChosen
                 }
             }
         }

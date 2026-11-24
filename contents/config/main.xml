@@ -49,7 +49,11 @@
     </entry>
     <entry name="segmentSeparator" type="string">
       <label>Text placed between visible segments.</label>
-      <default> | </default>
+      <default>|</default>
+    </entry>
+    <entry name="padSeparator" type="Bool">
+      <label>Add a space on each side of the separator (KConfig strips surrounding whitespace from defaults).</label>
+      <default>true</default>
     </entry>
     <entry name="autoFontAndSize" type="Bool">
       <label>Use Plasma default font and automatically determine font size.</label>

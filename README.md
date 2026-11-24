@@ -9,7 +9,7 @@ I personally could not stand having my date and time stacked vertically using th
 
 ## Install
 
-`./install.sh`  *`install.sh` uses `kpackagetool6` to install under `~/.local/share/plasma/plasmoids/com.github.N0repi.compactclock`. Re-run `git pull` to upgrade.*
+`./install.sh`  *`install.sh` uses `kpackagetool6` to install under `~/.local/share/plasma/plasmoids/com.github.axelroman-dev.compactclock`. Re-run `git pull` to upgrade.*
 Or
 Add **Compact Clock** from the widget explorer.
 
@@ -19,7 +19,7 @@ Right-click the widget → **Configure Compact Clock** → **Appearance**
 
 - **Show:** Time / Day / Date
 - **Segment order:** presets or custom `time,day,date`
-- **Separator:** default is ` | ` but it can be any character. eg ` x `
+- **Separator:** default is `|` with *Add spaces around separator* enabled (renders ` | `). Any text works, e.g. `x` or `•`.
 - Day / date / time formats, time zone, font (same ideas as stock)
 - The `Date format` is rendered as the primary clock.
 
@@ -41,12 +41,13 @@ Examples:
 ## Uninstall
 
 ```bash
-kpackagetool6 --type Plasma/Applet --remove com.github.N0repi.compactclock
-# or: rm -rf ~/.local/share/plasma/plasmoids/com.github.N0repi.compactclock
+kpackagetool6 --type Plasma/Applet --remove com.github.axelroman-dev.compactclock
+# or: rm -rf ~/.local/share/plasma/plasmoids/com.github.axelroman-dev.compactclock
 ```
 
 # *Note*
-This was tested on Fedora 44 using KDE Plasma Version 6.7.3, using Wayland.
+Tested on Fedora 45 with KDE Plasma 6.8.3 (Qt 6.11), Wayland.
+Originally tested on Fedora 44 with Plasma 6.7.3.
 
 ## Inspiration
 

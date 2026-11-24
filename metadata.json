@@ -3,17 +3,20 @@
     "KPlugin": {
         "Authors": [
             {
+                "Name": "axelroman-dev"
+            },
+            {
                 "Name": "N0repi"
             }
         ],
         "Category": "Date and Time",
         "Description": "Compact panel clock with configurable order for time, day, and date on one line",
         "Icon": "/icon.png",
-        "Id": "com.github.N0repi.compactclock",
+        "Id": "com.github.axelroman-dev.compactclock",
         "License": "GPL-3.0-or-later",
         "Name": "Compact Clock",
-        "Version": "0.1.0",
-        "Website": "https://github.com/N0repi/kde-compact-clock"
+        "Version": "0.2.0",
+        "Website": "https://github.com/axelroman-dev/kde-compact-clock"
     },
     "X-Plasma-API": "declarativeappletscript",
     "X-Plasma-API-Minimum-Version": "6.0",
